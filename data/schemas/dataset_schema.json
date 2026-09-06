@@ -1,0 +1,23 @@
+{
+  "$schema_purpose": "Human/tool-readable reference for the dataset shape FORESIGHT Nexus expects. This file documents the contract; it is NOT read or enforced by the application at runtime. The single source of truth for actual validation and cleaning is data/loader.py — duplicating that logic here as a second, silently-drifting implementation would be worse than not having this file at all.",
+  "dataset_name": "sales_inventory_history",
+  "required_columns": [
+    {"name": "date",         "type": "date",   "description": "Transaction/observation date. Parsed with pandas.to_datetime; unparseable rows are dropped (see data/loader.py::clean_dataset)."},
+    {"name": "product_id",   "type": "string", "description": "Stable unique identifier for a product. Used as the grouping key for every per-product calculation."},
+    {"name": "product_name", "type": "string", "description": "Human-readable product name, shown throughout the UI."},
+    {"name": "quantity",     "type": "number",  "description": "Units sold/demanded on that date for that product. Coerced to numeric; negative values are clipped to 0 with a note in the cleaning log."}
+  ],
+  "optional_columns": [
+    {"name": "category",  "type": "string", "description": "Product category, enables category-level analytics and grouping. Features depending on it are skipped (not faked) when absent."},
+    {"name": "price",     "type": "number", "description": "Unit price. Enables inventory value and reorder-value financial metrics; those metrics are explicitly reported as unavailable when this column is missing."},
+    {"name": "revenue",   "type": "number", "description": "Revenue for that date/product row, if tracked separately from price × quantity."},
+    {"name": "promotion", "type": "boolean", "description": "Whether a promotion was active on that date — informational; not currently used as a model feature."},
+    {"name": "supplier",  "type": "string", "description": "Supplier identifier — informational; not currently used in any calculation."},
+    {"name": "lead_time", "type": "number", "description": "Supplier lead time in days. Falls back to Settings > Default Lead Time when missing for a product."},
+    {"name": "inventory", "type": "number", "description": "Units on hand as of that date. Required for every inventory/risk/recommendation feature — those pages show an explicit empty state when this column is absent, rather than fabricating stock levels."}
+  ],
+  "notes": [
+    "Validation, column mapping, and cleaning logic live in data/loader.py.",
+    "This file exists for onboarding/documentation and for any external tooling that wants a machine-readable contract — it deliberately contains no logic of its own."
+  ]
+}

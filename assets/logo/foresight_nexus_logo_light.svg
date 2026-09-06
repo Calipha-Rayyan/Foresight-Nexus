@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 240" role="img" aria-labelledby="t d">
+<title id="t">FORESIGHT Nexus</title>
+<desc id="d">A forward-rising forecast ribbon paired with demand bars, representing prediction and inventory intelligence.</desc>
+<defs>
+  <linearGradient id="g" x1="0" y1="1" x2="1" y2="0">
+    <stop offset="0" stop-color="#1E5EFF"/>
+    <stop offset=".55" stop-color="#28B8FF"/>
+    <stop offset="1" stop-color="#8A63FF"/>
+  </linearGradient>
+</defs>
+<rect width="920" height="240" rx="28" fill="#F7FAFC"/>
+<g transform="translate(30 35)">
+  <rect x="0" y="0" width="170" height="170" rx="34" fill="#FFFFFF" stroke="#D9E3EF"/>
+  <path d="M32 119 C55 97, 72 98, 88 78 C105 56, 119 64, 138 35"
+        fill="none" stroke="url(#g)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M118 31 L142 31 L142 55" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="33" y="121" width="13" height="20" rx="4" fill="#2AB8FF"/>
+  <rect x="57" y="108" width="13" height="33" rx="4" fill="#2AB8FF"/>
+  <rect x="81" y="92" width="13" height="49" rx="4" fill="#5A8BFF"/>
+  <circle cx="138" cy="35" r="6" fill="#F4FBFF"/>
+</g>
+<text x="235" y="112" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="64" font-weight="750" letter-spacing="5" fill="#0B1220">FORESIGHT</text>
+<text x="239" y="163" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="39" font-weight="550" letter-spacing="10" fill="url(#g)">NEXUS</text>
+<text x="241" y="202" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="450" letter-spacing="3" fill="#5A6A7D">SEE DEMAND BEFORE IT HAPPENS.</text>
+</svg>
