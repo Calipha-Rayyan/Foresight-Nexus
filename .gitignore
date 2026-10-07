@@ -13,3 +13,10 @@ models/metadata/*
 *.db
 .streamlit/secrets.toml
 .DS_Store
+
+# Generated QA artifacts
+/scratch/
+/docs/screenshots/
+*.webm
+/project_snapshot.txt
+

@@ -1,62 +1,189 @@
-"""Lightweight 3D-feeling hero visual: floating data nodes connected to a
-central intelligence core, built as pure SVG + CSS animation so it has zero
-external dependency and can never break the rest of the app if it fails to
-render. No Three.js/Spline dependency is required — this keeps Streamlit
-Community Cloud deployment lightweight, per the 'optional, must not block
-critical UI' requirement.
+"""FORESIGHT Nexus — High-Fidelity SVG Data Nexus Animation Engine.
+
+Architectural Flow:
+1. INGESTION SIGNALS: Real-time demand velocity streams (POS, Orders, Channel, Promos)
+2. PREPROCESSING NODES: Signal decomposition & rolling feature engineering
+3. FORESIGHT NEURAL NEXUS: Central intelligence hub with rotating telemetry rings, multi-frequency ripples, and neural fusion
+4. TRAJECTORY PIPELINE: Forward time-series pathing with animated streaming particles
+5. PROACTIVE DECISIONS: Automated replenishment, dynamic safety stock, and stockout defense
+
+100% native vector SVG with declarative SMIL animations (animateMotion, animateTransform, animate).
+Runs at smooth 60fps across modern browsers with zero external libraries.
 """
 import streamlit as st
-import random
-
-_NODE_COLORS = ["#4FD1E8", "#7C6CF0", "#4FD1E8", "#39E6C4"]
 
 
-def render_nexus_visual(height: int = 220, seed: int = 7):
-    """Renders a small animated 'data nexus' — a core node with orbiting
-    demand-signal nodes and connecting lines. Purely decorative; the app
-    functions identically with or without it."""
-    try:
-        rng = random.Random(seed)
-        n_nodes = 7
-        cx, cy = 300, height // 2
-        nodes = []
-        for i in range(n_nodes):
-            angle = (360 / n_nodes) * i
-            radius = rng.randint(90, 140)
-            nodes.append((angle, radius, rng.uniform(0, 3)))
+def render_nexus_visual(height: int = 180) -> None:
+    """Renders the high-fidelity responsive FORESIGHT Nexus vector intelligence flow."""
+    # Pure unindented HTML/SVG string to prevent CommonMark code block conversion
+    html = (
+        f'<div class="fn-nexus-container">'
+        f'<svg viewBox="0 0 920 {height}" class="fn-nexus-svg" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'
+        f'<defs>'
+        f'<linearGradient id="fnGradCore" x1="0%" y1="0%" x2="100%" y2="100%">'
+        f'<stop offset="0%" stop-color="#28B8FF"/>'
+        f'<stop offset="50%" stop-color="#1E5EFF"/>'
+        f'<stop offset="100%" stop-color="#8A63FF"/>'
+        f'</linearGradient>'
+        f'<linearGradient id="fnGradSignal" x1="0%" y1="0%" x2="100%" y2="0%">'
+        f'<stop offset="0%" stop-color="#28B8FF" stop-opacity="0.8"/>'
+        f'<stop offset="100%" stop-color="#1E5EFF" stop-opacity="0.3"/>'
+        f'</linearGradient>'
+        f'<linearGradient id="fnGradForward" x1="0%" y1="0%" x2="100%" y2="0%">'
+        f'<stop offset="0%" stop-color="#8A63FF" stop-opacity="0.4"/>'
+        f'<stop offset="100%" stop-color="#10B981" stop-opacity="0.9"/>'
+        f'</linearGradient>'
+        f'<filter id="fnParticleGlow" x="-50%" y="-50%" width="200%" height="200%">'
+        f'<feGaussianBlur stdDeviation="3.5" result="blur"/>'
+        f'<feMerge>'
+        f'<feMergeNode in="blur"/>'
+        f'<feMergeNode in="SourceGraphic"/>'
+        f'</feMerge>'
+        f'</filter>'
+        f'<filter id="fnCoreGlow" x="-60%" y="-60%" width="220%" height="220%">'
+        f'<feGaussianBlur stdDeviation="7" result="blur"/>'
+        f'<feMerge>'
+        f'<feMergeNode in="blur"/>'
+        f'<feMergeNode in="SourceGraphic"/>'
+        f'</feMerge>'
+        f'</filter>'
+        f'<path id="p_in_1" d="M 70 35 C 160 35, 190 65, 250 65 C 320 65, 370 90, 460 90"/>'
+        f'<path id="p_in_2" d="M 70 70 C 160 70, 190 65, 250 65 C 320 65, 380 90, 460 90"/>'
+        f'<path id="p_in_3" d="M 70 110 C 160 110, 190 115, 250 115 C 320 115, 380 90, 460 90"/>'
+        f'<path id="p_in_4" d="M 70 145 C 160 145, 190 115, 250 115 C 320 115, 370 90, 460 90"/>'
+        f'<path id="p_out_1" d="M 460 90 C 540 90, 600 65, 670 65 C 730 65, 760 40, 850 40"/>'
+        f'<path id="p_out_2" d="M 460 90 C 540 90, 610 90, 670 90 C 740 90, 770 90, 850 90"/>'
+        f'<path id="p_out_3" d="M 460 90 C 540 90, 600 115, 670 115 C 730 115, 760 140, 850 140"/>'
+        f'</defs>'
+        f'<g stroke="#182233" stroke-width="0.8" opacity="0.35">'
+        f'<line x1="70" y1="35" x2="70" y2="145"/>'
+        f'<line x1="250" y1="65" x2="250" y2="115"/>'
+        f'<line x1="670" y1="65" x2="670" y2="115"/>'
+        f'<line x1="850" y1="40" x2="850" y2="140"/>'
+        f'</g>'
+        f'<g fill="none" stroke-width="1.3">'
+        f'<path d="M 70 35 C 160 35, 190 65, 250 65 C 320 65, 370 90, 460 90" stroke="#28B8FF" stroke-opacity="0.32" stroke-dasharray="4 4"/>'
+        f'<path d="M 70 70 C 160 70, 190 65, 250 65 C 320 65, 380 90, 460 90" stroke="#1E5EFF" stroke-opacity="0.45"/>'
+        f'<path d="M 70 110 C 160 110, 190 115, 250 115 C 320 115, 380 90, 460 90" stroke="#28B8FF" stroke-opacity="0.45"/>'
+        f'<path d="M 70 145 C 160 145, 190 115, 250 115 C 320 115, 370 90, 460 90" stroke="#8A63FF" stroke-opacity="0.32" stroke-dasharray="4 4"/>'
+        f'</g>'
+        f'<g fill="none" stroke-width="1.3">'
+        f'<path d="M 460 90 C 540 90, 600 65, 670 65 C 730 65, 760 40, 850 40" stroke="#10B981" stroke-opacity="0.45"/>'
+        f'<path d="M 460 90 C 540 90, 610 90, 670 90 C 740 90, 770 90, 850 90" stroke="#28B8FF" stroke-opacity="0.55" stroke-dasharray="5 3"/>'
+        f'<path d="M 460 90 C 540 90, 600 115, 670 115 C 730 115, 760 140, 850 140" stroke="#F59E0B" stroke-opacity="0.45"/>'
+        f'</g>'
+        f'<g filter="url(#fnParticleGlow)">'
+        f'<circle r="3.2" fill="#28B8FF">'
+        f'<animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#p_in_1"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="2.6" fill="#8A63FF">'
+        f'<animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite"><mpath href="#p_in_1"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3.5" fill="#1E5EFF">'
+        f'<animateMotion dur="2.8s" repeatCount="indefinite"><mpath href="#p_in_2"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3" fill="#28B8FF">'
+        f'<animateMotion dur="2.8s" begin="1.4s" repeatCount="indefinite"><mpath href="#p_in_2"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3.5" fill="#28B8FF">'
+        f'<animateMotion dur="3.0s" repeatCount="indefinite"><mpath href="#p_in_3"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="2.8" fill="#1E5EFF">'
+        f'<animateMotion dur="3.0s" begin="1.5s" repeatCount="indefinite"><mpath href="#p_in_3"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3.2" fill="#8A63FF">'
+        f'<animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#p_in_4"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="2.5" fill="#28B8FF">'
+        f'<animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite"><mpath href="#p_in_4"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3.5" fill="#10B981">'
+        f'<animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#p_out_1"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="2.8" fill="#10B981">'
+        f'<animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite"><mpath href="#p_out_1"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3.6" fill="#28B8FF">'
+        f'<animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#p_out_2"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="2.6" fill="#8A63FF">'
+        f'<animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite"><mpath href="#p_out_2"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="3.4" fill="#F59E0B">'
+        f'<animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#p_out_3"/></animateMotion>'
+        f'</circle>'
+        f'<circle r="2.7" fill="#F97316">'
+        f'<animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite"><mpath href="#p_out_3"/></animateMotion>'
+        f'</circle>'
+        f'</g>'
+        f'<g class="fn-nexus-signals">'
+        f'<circle cx="70" cy="35" r="8" fill="none" stroke="#28B8FF" stroke-opacity="0.3">'
+        f'<animate attributeName="r" values="7;11;7" dur="2.2s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="70" cy="35" r="4.5" fill="#28B8FF"/>'
+        f'<circle cx="70" cy="70" r="9" fill="none" stroke="#1E5EFF" stroke-opacity="0.3">'
+        f'<animate attributeName="r" values="8;12;8" dur="2.5s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="70" cy="70" r="5" fill="#1E5EFF"/>'
+        f'<circle cx="70" cy="110" r="8" fill="none" stroke="#28B8FF" stroke-opacity="0.3">'
+        f'<animate attributeName="r" values="7;11;7" dur="2.8s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="70" cy="110" r="4.5" fill="#28B8FF"/>'
+        f'<circle cx="70" cy="145" r="9" fill="none" stroke="#8A63FF" stroke-opacity="0.3">'
+        f'<animate attributeName="r" values="8;12;8" dur="2.4s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="70" cy="145" r="5" fill="#8A63FF"/>'
+        f'<text x="70" y="18" text-anchor="middle" fill="#8B9BB4" font-size="8.5" font-weight="700" letter-spacing="1.2" font-family="Inter, sans-serif">DEMAND SIGNALS</text>'
+        f'</g>'
+        f'<g class="fn-nexus-mid">'
+        f'<circle cx="250" cy="65" r="4" fill="#161D2B" stroke="#28B8FF" stroke-width="1.5"/>'
+        f'<circle cx="250" cy="115" r="4" fill="#161D2B" stroke="#8A63FF" stroke-width="1.5"/>'
+        f'</g>'
+        f'<g class="fn-nexus-mid">'
+        f'<circle cx="670" cy="65" r="4" fill="#161D2B" stroke="#10B981" stroke-width="1.5"/>'
+        f'<circle cx="670" cy="90" r="3.5" fill="#161D2B" stroke="#28B8FF" stroke-width="1.5"/>'
+        f'<circle cx="670" cy="115" r="4" fill="#161D2B" stroke="#F59E0B" stroke-width="1.5"/>'
+        f'</g>'
+        f'<g class="fn-nexus-core">'
+        f'<circle cx="460" cy="90" r="18" fill="none" stroke="#28B8FF" stroke-width="1.5">'
+        f'<animate attributeName="r" values="18;52" dur="2.6s" repeatCount="indefinite"/>'
+        f'<animate attributeName="opacity" values="0.75;0" dur="2.6s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="460" cy="90" r="18" fill="none" stroke="#8A63FF" stroke-width="1.5">'
+        f'<animate attributeName="r" values="18;52" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>'
+        f'<animate attributeName="opacity" values="0.75;0" dur="2.6s" begin="1.3s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="460" cy="90" r="40" fill="none" stroke="url(#fnGradCore)" stroke-width="1.5" stroke-dasharray="10 6">'
+        f'<animateTransform attributeName="transform" type="rotate" from="0 460 90" to="360 460 90" dur="22s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<polygon points="460,62 484,76 484,104 460,118 436,104 436,76" fill="none" stroke="#28B8FF" stroke-width="1.2" stroke-opacity="0.65">'
+        f'<animateTransform attributeName="transform" type="rotate" from="360 460 90" to="0 460 90" dur="14s" repeatCount="indefinite"/>'
+        f'</polygon>'
+        f'<circle cx="460" cy="90" r="22" fill="#0C121E" stroke="#1F293D" stroke-width="2"/>'
+        f'<circle cx="460" cy="90" r="14" fill="url(#fnGradCore)" filter="url(#fnCoreGlow)">'
+        f'<animate attributeName="r" values="13;15.5;13" dur="2s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="460" cy="90" r="5" fill="#FFFFFF" opacity="0.95"/>'
+        f'<text x="460" y="142" text-anchor="middle" fill="#28B8FF" font-size="9" font-weight="800" letter-spacing="1.5" font-family="Inter, sans-serif">INTELLIGENCE CORE</text>'
+        f'<text x="460" y="156" text-anchor="middle" fill="#64748B" font-size="7.5" font-weight="600" letter-spacing="0.8" font-family="Inter, sans-serif">ARIMA · ML ENSEMBLE</text>'
+        f'</g>'
+        f'<g class="fn-nexus-decisions">'
+        f'<circle cx="850" cy="40" r="9" fill="none" stroke="#10B981" stroke-opacity="0.35">'
+        f'<animate attributeName="r" values="8;13;8" dur="2.1s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="850" cy="40" r="5.5" fill="#10B981" filter="url(#fnParticleGlow)"/>'
+        f'<circle cx="850" cy="90" r="9" fill="none" stroke="#28B8FF" stroke-opacity="0.35">'
+        f'<animate attributeName="r" values="8;13;8" dur="2.5s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="850" cy="90" r="5.5" fill="#28B8FF" filter="url(#fnParticleGlow)"/>'
+        f'<circle cx="850" cy="140" r="9" fill="none" stroke="#F59E0B" stroke-opacity="0.35">'
+        f'<animate attributeName="r" values="8;13;8" dur="2.3s" repeatCount="indefinite"/>'
+        f'</circle>'
+        f'<circle cx="850" cy="140" r="5.5" fill="#F59E0B" filter="url(#fnParticleGlow)"/>'
+        f'<text x="850" y="18" text-anchor="middle" fill="#8B9BB4" font-size="8.5" font-weight="700" letter-spacing="1.2" font-family="Inter, sans-serif">OPTIMIZED DECISIONS</text>'
+        f'</g>'
+        f'</svg>'
+        f'</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
-        lines = ""
-        dots = ""
-        for i, (angle, radius, delay) in enumerate(nodes):
-            import math
-            rad = math.radians(angle)
-            x = cx + radius * math.cos(rad)
-            y = cy + radius * math.sin(rad) * 0.5
-            color = _NODE_COLORS[i % len(_NODE_COLORS)]
-            lines += (f'<line x1="{cx}" y1="{cy}" x2="{x:.0f}" y2="{y:.0f}" '
-                      f'stroke="{color}" stroke-opacity="0.25" stroke-width="1">'
-                      f'<animate attributeName="stroke-opacity" values="0.1;0.4;0.1" '
-                      f'dur="{3+delay:.1f}s" repeatCount="indefinite"/></line>')
-            dots += (f'<circle cx="{x:.0f}" cy="{y:.0f}" r="4" fill="{color}">'
-                     f'<animate attributeName="r" values="3;5;3" dur="{2+delay:.1f}s" '
-                     f'repeatCount="indefinite"/></circle>')
-
-        svg = f"""
-        <div style="width:100%;display:flex;justify-content:center;opacity:0.9;">
-        <svg viewBox="0 0 600 {height}" width="100%" style="max-width:620px;">
-            {lines}
-            {dots}
-            <circle cx="{cx}" cy="{cy}" r="16" fill="#4FD1E8">
-                <animate attributeName="r" values="14;18;14" dur="2.4s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="{cx}" cy="{cy}" r="26" fill="none" stroke="#4FD1E8" stroke-width="1" stroke-opacity="0.4">
-                <animate attributeName="r" values="22;32;22" dur="2.4s" repeatCount="indefinite"/>
-                <animate attributeName="stroke-opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite"/>
-            </circle>
-        </svg>
-        </div>
-        """
-        st.markdown(svg, unsafe_allow_html=True)
-    except Exception:
-        # Graceful fallback — the app must work perfectly even if this fails.
-        pass

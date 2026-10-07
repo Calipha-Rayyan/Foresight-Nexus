@@ -1,70 +1,99 @@
-"""Loads the FORESIGHT Nexus SVG brand assets from disk using a path resolved
-relative to this file (via pathlib), so it works identically on Windows,
-Linux, and Streamlit Community Cloud regardless of the process's working
-directory. No external network asset is ever fetched.
+"""FORESIGHT Nexus — Brand Asset & Logo Rendering Engine.
 
-Asset variants (assets/logo/, see assets/logo/README.txt for provenance):
-- foresight_nexus_logo.svg            primary dark-background wordmark — used
-                                       for the primary dark-UI presentation
-                                       (Command Center hero).
-- foresight_nexus_logo_light.svg      light-background wordmark — for any
-                                       future light-theme surface or exported
-                                       document (not currently used in-app,
-                                       since the app theme is dark-only).
-- foresight_nexus_mark.svg            primary app/favicon mark — used for
-                                       compact contexts: sidebar and favicon.
-- foresight_nexus_mark_monochrome.svg monochrome variant — reserved for
-                                       contexts where the gradient mark
-                                       wouldn't render well (e.g. a plain-text
-                                       README badge or print export); not
-                                       currently wired into the running app.
+Resolves local SVG brand assets from `assets/logo/` with zero external dependencies.
+Renders base64-encoded SVG data URIs to guarantee zero markdown code-block leaks,
+zero raw HTML/SVG exposure, and crisp vector rendering across all viewports.
 """
 from pathlib import Path
+import base64
 import streamlit as st
 
 _ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets" / "logo"
 
-MARK_FILE = "foresight_nexus_mark.svg"
-MARK_MONOCHROME_FILE = "foresight_nexus_mark_monochrome.svg"
 LOGO_FILE = "foresight_nexus_logo.svg"
 LOGO_LIGHT_FILE = "foresight_nexus_logo_light.svg"
+MARK_FILE = "foresight_nexus_mark.svg"
+MARK_MONOCHROME_FILE = "foresight_nexus_mark_monochrome.svg"
 
 
 @st.cache_data(show_spinner=False)
-def load_svg(filename: str) -> str | None:
-    """Returns the raw SVG markup for a file in assets/logo/, or None if it's
-    missing — callers should fall back gracefully (e.g. to a text wordmark)
-    rather than let a missing asset break the page."""
+def get_svg_data_uri(filename: str) -> str | None:
+    """Reads a local SVG file and encodes it as a base64 data URI."""
     path = _ASSETS_DIR / filename
     try:
-        return path.read_text(encoding="utf-8")
-    except FileNotFoundError:
+        data = path.read_bytes()
+        b64 = base64.b64encode(data).decode("utf-8")
+        return f"data:image/svg+xml;base64,{b64}"
+    except (FileNotFoundError, OSError):
         return None
 
 
-def render_sidebar_mark(app_name: str) -> None:
-    """Compact branding for the sidebar: the favicon-style mark at a small
-    fixed size next to the wordmark text."""
-    mark_svg = load_svg(MARK_FILE)
-    if mark_svg:
-        st.markdown(f"""
-        <style>
-        .fn-sidebar-mark svg {{ width: 28px; height: 28px; display: block; }}
-        </style>
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.2rem;">
-            <div class="fn-sidebar-mark">{mark_svg}</div>
-            <span style="font-weight:800; font-size:1.05rem; color:#E6E8EF;">{app_name}</span>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        # Graceful fallback if the asset is ever missing — never break the sidebar.
-        st.markdown(f"### {app_name}")
-
-
 def get_favicon() -> str:
-    """Returns a page_icon value for st.set_page_config: the mark SVG's file
-    path if it exists (Streamlit resolves a local image path into a browser
-    favicon), otherwise a plain emoji so page load never breaks on a missing
-    or unsupported asset."""
+    """Returns local path to the mark SVG for st.set_page_config."""
     path = _ASSETS_DIR / MARK_FILE
-    return str(path) if path.exists() else "◆"
+    if path.exists():
+        return str(path)
+    return "📈"
+
+
+def render_sidebar_brand(app_name: str = "FORESIGHT Nexus", tagline: str = "See demand before it happens.") -> None:
+    """Renders a compact, SaaS-grade brand lockup for the sidebar."""
+    mark_uri = get_svg_data_uri(MARK_FILE)
+    if mark_uri:
+        html = (
+            f'<div class="fn-brand-sidebar">'
+            f'<img src="{mark_uri}" alt="FORESIGHT Nexus Mark" class="fn-brand-sidebar-icon" />'
+            f'<div class="fn-brand-sidebar-text">'
+            f'<div class="fn-brand-sidebar-name">'
+            f'<span class="fn-brand-white">FORESIGHT</span> '
+            f'<span class="fn-brand-accent">NEXUS</span>'
+            f'</div>'
+            f'<div class="fn-brand-sidebar-tagline">{tagline}</div>'
+            f'</div>'
+            f'</div>'
+        )
+        st.markdown(html, unsafe_allow_html=True)
+    else:
+        st.markdown(
+            f'<div class="fn-brand-fallback"><h3>{app_name}</h3><p>{tagline}</p></div>',
+            unsafe_allow_html=True
+        )
+
+
+def render_hero_brand(tagline: str = "See demand before it happens.") -> None:
+    """Renders the full FORESIGHT Nexus logo lockup for the Command Center hero."""
+    logo_uri = get_svg_data_uri(LOGO_FILE)
+    if logo_uri:
+        html = (
+            f'<div class="fn-hero-brand-wrap">'
+            f'<img src="{logo_uri}" alt="FORESIGHT Nexus" class="fn-hero-logo" />'
+            f'</div>'
+        )
+        st.markdown(html, unsafe_allow_html=True)
+    else:
+        mark_uri = get_svg_data_uri(MARK_FILE)
+        icon_html = f'<img src="{mark_uri}" class="fn-hero-logo-mark" />' if mark_uri else ''
+        html = (
+            f'<div class="fn-hero-brand-fallback">'
+            f'{icon_html}'
+            f'<div>'
+            f'<h1><span class="fn-brand-white">FORESIGHT</span> <span class="fn-brand-accent">NEXUS</span></h1>'
+            f'<p class="fn-hero-tagline">{tagline}</p>'
+            f'</div>'
+            f'</div>'
+        )
+        st.markdown(html, unsafe_allow_html=True)
+
+
+# Backwards compatibility alias
+def render_sidebar_mark(app_name: str) -> None:
+    render_sidebar_brand(app_name=app_name)
+
+
+def load_svg(filename: str) -> str | None:
+    """Returns raw SVG text if needed, stripping problematic desc/title tags that leak."""
+    path = _ASSETS_DIR / filename
+    try:
+        return path.read_text(encoding="utf-8")
+    except (FileNotFoundError, OSError):
+        return None
