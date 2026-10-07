@@ -1,44 +1,95 @@
+"""FORESIGHT Nexus — Configuration & Calibration Settings.
+
+Allows operators to tune forecast horizons, machine-learning data thresholds,
+service-level safety stock multipliers (Z-scores), and risk warning triggers.
+"""
 import streamlit as st
 from core.config import Settings
 from database.repositories import SettingsRepository
+from ui.headers import render_page_header, render_section_header
 from utils.logging import log_error
 
-st.title("Settings")
-st.caption("Configure the assumptions FORESIGHT Nexus uses for forecasting, risk, and reordering.")
+render_page_header(
+    "Settings & Model Calibration",
+    "Configure forecasting assumptions, safety stock buffers, and catalog risk thresholds.",
+    meta_items=["Zero External Telemetry", "100% Local Execution", "State Persistence"]
+)
 
 s = st.session_state["settings"]
 
-st.markdown("### Forecasting")
-horizon = st.slider("Default Forecast Horizon (days)", 7, 90, s.forecast_horizon_days,
-                     help="Default number of days ahead shown on the Command Center outlook chart.")
-min_ml = st.slider("Minimum history required for ML models (days)", 30, 180, s.min_history_days_for_ml,
-                    help="Products with less history than this fall back to baseline models — ML needs enough data to learn patterns reliably.")
-folds = st.slider("Backtest folds", 1, 5, s.backtest_folds, help="Number of rolling train/test splits used to evaluate each model.")
-bt_horizon = st.slider("Backtest horizon (days)", 7, 30, s.backtest_horizon_days, help="Length of each held-out evaluation window.")
+render_section_header("Forecasting Parameters", "Configure model horizon length and machine learning eligibility criteria.")
+col_f1, col_f2 = st.columns(2)
+with col_f1:
+    horizon = st.slider(
+        "Default Forecast Horizon (Days)",
+        min_value=7, max_value=90, value=s.forecast_horizon_days,
+        help="Default forward horizon for Command Center and Forecast Studio."
+    )
+    min_ml = st.slider(
+        "Minimum History Required for ML Models (Days)",
+        min_value=30, max_value=180, value=s.min_history_days_for_ml,
+        help="SKUs with history below this threshold automatically fall back to baseline models."
+    )
 
-st.markdown("### Inventory")
-lead_time = st.slider("Default Lead Time (days)", 1, 30, s.default_lead_time_days,
-                       help="Used when a product's supplier lead time is not present in the uploaded data.")
-z = st.slider("Service Level (Z-score)", 1.0, 2.5, s.service_level_z, step=0.05,
-              help="Higher = more safety stock, lower stockout probability. 1.65 ≈ 95% service level.")
+with col_f2:
+    folds = st.slider(
+        "Backtest Cross-Validation Folds",
+        min_value=1, max_value=5, value=s.backtest_folds,
+        help="Number of non-overlapping rolling evaluation splits used in model selection."
+    )
+    bt_horizon = st.slider(
+        "Backtest Evaluation Window (Days)",
+        min_value=7, max_value=30, value=s.backtest_horizon_days,
+        help="Held-out forward evaluation period for each backtest split."
+    )
 
-st.markdown("### Risk Thresholds")
-stockout_thresh = st.slider("Stockout Risk Threshold (days of coverage)", 3, 30, s.stockout_risk_days_threshold,
-                             help="Products with fewer days of coverage than this are flagged at risk.")
-overstock_thresh = st.slider("Overstock Threshold (days of coverage)", 30, 180, s.overstock_days_threshold,
-                              help="Products with more days of coverage than this are flagged as overstocked.")
+render_section_header("Inventory & Service Level Assumptions", "Tune buffer sizing and supplier lead-time defaults.")
+col_i1, col_i2 = st.columns(2)
+with col_i1:
+    lead_time = st.slider(
+        "Default Supplier Lead Time (Days)",
+        min_value=1, max_value=45, value=s.default_lead_time_days,
+        help="Used as fallback when supplier lead time is unmapped in the dataset."
+    )
+with col_i2:
+    z = st.slider(
+        "Service Level Factor (Z-Score)",
+        min_value=1.0, max_value=2.5, value=s.service_level_z, step=0.05,
+        help="Multiplied by standard deviation of lead-time demand to size safety stock. 1.65 ≈ 95% service level, 2.05 ≈ 98%."
+    )
 
-if st.button("Save Settings", type="primary"):
+render_section_header("Risk Thresholds & Exposure Triggers", "Define days-of-coverage triggers for stockout and overstock alerts.")
+col_r1, col_r2 = st.columns(2)
+with col_r1:
+    stockout_thresh = st.slider(
+        "Stockout Exposure Threshold (Days of Coverage)",
+        min_value=3, max_value=30, value=s.stockout_risk_days_threshold,
+        help="Products with fewer days of projected coverage are flagged as Critical/High stockout risk."
+    )
+with col_r2:
+    overstock_thresh = st.slider(
+        "Overstock Warning Threshold (Days of Coverage)",
+        min_value=30, max_value=180, value=s.overstock_days_threshold,
+        help="Products with more days of projected coverage are flagged as Overstock Working Capital Lockup."
+    )
+
+st.write("")
+if st.button("Save & Apply Platform Configuration", type="primary"):
     st.session_state["settings"] = Settings(
-        forecast_horizon_days=horizon, default_lead_time_days=lead_time, service_level_z=z,
-        stockout_risk_days_threshold=stockout_thresh, overstock_days_threshold=overstock_thresh,
-        min_history_days_for_ml=min_ml, backtest_folds=folds, backtest_horizon_days=bt_horizon,
+        forecast_horizon_days=horizon,
+        default_lead_time_days=lead_time,
+        service_level_z=z,
+        stockout_risk_days_threshold=stockout_thresh,
+        overstock_days_threshold=overstock_thresh,
+        min_history_days_for_ml=min_ml,
+        backtest_folds=folds,
+        backtest_horizon_days=bt_horizon,
     )
     try:
         SettingsRepository.save(st.session_state["settings"].__dict__)
     except Exception as e:
         log_error("Failed to persist settings snapshot", e)
-    st.success("Settings saved. They will apply the next time a page recalculates.")
+    st.success("✅ Configuration updated successfully. All parameters will apply to subsequent analytical passes.")
 
 st.divider()
-st.caption("FORESIGHT Nexus never sends your dataset to external APIs — all processing runs locally in this Streamlit session.")
+st.caption("🔒 **Security & Privacy:** FORESIGHT Nexus processes all telemetry locally within your session. No data is transmitted to external endpoints.")
